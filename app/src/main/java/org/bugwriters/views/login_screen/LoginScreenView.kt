@@ -47,7 +47,7 @@ fun LoginScreenView(state: LoginViewState, navController: NavController) {
             PasswordField(state, it)
             Spacer(modifier = Modifier.height(dp40))
             BasicButton("Log in", Green, enabled = !state.isError.value) {
-                navController.navigate(Screens.main_screen_business) {
+                navController.navigate(Screens.main_screen_client) {
                     launchSingleTop = true
                 }
             }

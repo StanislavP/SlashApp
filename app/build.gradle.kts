@@ -91,7 +91,8 @@ dependencies {
     kapt ("androidx.room:room-compiler:2.6.0")
     implementation("androidx.room:room-paging:2.6.0")
 
-
+    // Stripe Android SDK
+    implementation("com.stripe:stripe-android:20.34.1")
 }
 kapt {
     correctErrorTypes = true

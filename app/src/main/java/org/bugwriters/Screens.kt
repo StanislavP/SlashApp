@@ -8,6 +8,6 @@ object Screens {
     const val splashScreen = "splash_screen"
     const val edit_offer = "edit_offer"
     const val login = "login"
-
+    const val checkout = "checkout"
 
 }
