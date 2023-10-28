@@ -4,7 +4,15 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import org.bugwriters.ErrorMessages
+import org.bugwriters.connection.API
+import org.bugwriters.connection.createRetrofitService
+import org.bugwriters.connection.executeRequest
+import org.bugwriters.connection.models.bodies.RegisterBody
+import org.bugwriters.connection.models.bodies.Roles
 
 class RegisterBusinessState {
     var name by mutableStateOf("")
@@ -31,6 +39,25 @@ class RegisterBusinessState {
     val errorMassageEmail by mutableStateOf(ErrorMessages.emptyField)
     val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
     val errorMassageConfirmPassword by mutableStateOf(ErrorMessages.emptyField)
+
+    private val scope = CoroutineScope(Dispatchers.IO)
+
+    suspend fun register(): Boolean = scope.async {
+
+        val service = createRetrofitService(API::class.java)
+        var flag = false
+        executeRequest {
+            service.postSignup(
+                RegisterBody(
+                    name,
+                    email,
+                    password,
+                    listOf(Roles.ROLE_BUSINESS)
+                )
+            )
+        }.onSuccess { flag = true }
+        return@async flag
+    }.await()
 
 
 }

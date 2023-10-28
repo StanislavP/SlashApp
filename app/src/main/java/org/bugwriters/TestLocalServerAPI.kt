@@ -1,5 +1,6 @@
 package org.bugwriters
 
+import org.bugwriters.connection.models.responses.PaymentSheetResponse
 import org.bugwriters.paymentprovider.stripe.ClientInfoRequest
 import retrofit2.http.Body
 import retrofit2.http.Headers
@@ -12,9 +13,3 @@ interface TestLocalServerAPI {
     suspend fun postPaymentSheet(@Body request: ClientInfoRequest): PaymentSheetResponse
 }
 
-data class PaymentSheetResponse(
-    val paymentIntent: String,
-    val customer: String,
-    val ephemeralKey: String,
-    val publishableKey: String
-)

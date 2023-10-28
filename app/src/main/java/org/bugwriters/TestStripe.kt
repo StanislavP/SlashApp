@@ -1,14 +1,10 @@
 package org.bugwriters
 
-import android.content.Context
-import android.util.Log
-import androidx.activity.ComponentActivity
-import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
-import com.stripe.android.paymentsheet.PaymentSheetResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.bugwriters.connection.models.responses.PaymentSheetResponse
 
 class TestStripe(
 

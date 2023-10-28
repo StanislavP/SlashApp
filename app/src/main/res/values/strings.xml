@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Slash App</string>
+    <string name="confirm">Confirm</string>
+    <string name="decline">Decline</string>
+    <string name="connection_error">Connection error</string>
+    <string name="failed_login">Failed login atempt!</string>
+    <string name="unauthorized">Unauthorized aka bad credentials</string>
+    <string name="unauthorised">Unauthorized aka bad credentials</string>
+    <string name="log_out_massege">Are you sure you want to logout?</string>
+    <string name="sesion_expired">Sesion expired!Please log in again</string>
 </resources>

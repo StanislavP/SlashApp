@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,17 +16,26 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.bugwriters.GlobalProgressCircle
+import org.bugwriters.Screens
 import org.bugwriters.reusable_ui_elements.BasicButton
+import org.bugwriters.reusable_ui_elements.Card
 import org.bugwriters.reusable_ui_elements.TextField
 import org.bugwriters.reusable_ui_elements.ViewHolder
 import org.bugwriters.ui.theme.Green
 import org.bugwriters.views.register.register_client.RegisterClientState
 
 @Composable
-fun RegisterViewBusiness(state: RegisterBusinessState) {
+fun RegisterViewBusiness(state: RegisterBusinessState,navController: NavController) {
     val dp10 = remember {
         10.dp
     }
@@ -32,20 +43,9 @@ fun RegisterViewBusiness(state: RegisterBusinessState) {
     val dp40 = remember {
         40.dp
     }
+
     ViewHolder(Alignment.CenterHorizontally, Arrangement.Center) {
-        Column(
-            modifier = Modifier
-                .size(360.dp, 450.dp)
-                .shadow(5.dp, spotColor = Color.Black, ambientColor = Green)
-                .layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    layout(placeable.width, placeable.height) {
-                        placeable.placeRelative(0, 0)
-                    }
-                },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Card {
             Text(text = "Register", fontSize = 24.sp, color = Green)
             Spacer(modifier = Modifier.height(dp40))
             NameField(state, it)
@@ -53,10 +53,22 @@ fun RegisterViewBusiness(state: RegisterBusinessState) {
             EmailField(state, it)
             Spacer(modifier = Modifier.height(dp10))
             PasswordField(state, it)
-            Spacer(modifier = Modifier.height(dp40))
-            ConfirmPasswordField(state,it)
+            Spacer(modifier = Modifier.height(dp10))
+            ConfirmPasswordField(state, it)
             Spacer(modifier = Modifier.height(dp40))
             BasicButton("Register", Green, enabled = !state.isError.value) {
+                GlobalProgressCircle.show()
+                CoroutineScope(Dispatchers.IO).launch {
+                    val flag = state.register()
+                    withContext(Dispatchers.Main) {
+
+                        if (flag) navController.navigate(Screens.login) {
+                            launchSingleTop = true
+                            popUpTo(Screens.login)
+                        }
+                        GlobalProgressCircle.dismiss()
+                    }
+                }
             }
         }
     }
@@ -70,7 +82,8 @@ private fun NameField(state: RegisterBusinessState, focusRequester: FocusRequest
         state.name,
         { value -> state.name = value },
         isError = state.isErrorName.value,
-        errorText = state.errorMassageName
+        errorText = state.errorMassageName,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
     )
 }
 
@@ -82,7 +95,8 @@ private fun EmailField(state: RegisterBusinessState, focusRequester: FocusReques
         state.email,
         { value -> state.email = value },
         isError = state.isErrorEmail.value,
-        errorText = state.errorMassageEmail
+        errorText = state.errorMassageEmail,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
     )
 }
 
@@ -95,9 +109,11 @@ fun PasswordField(state: RegisterBusinessState, focusRequester: FocusRequester) 
         { value -> state.password = value },
         visualTransformation = PasswordVisualTransformation(),
         isError = state.isPasswordError.value,
-        errorText = state.errorMassagePassword
+        errorText = state.errorMassagePassword,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
     )
 }
+
 @Composable
 private fun ConfirmPasswordField(state: RegisterBusinessState, focusRequester: FocusRequester) {
     TextField(
@@ -107,6 +123,8 @@ private fun ConfirmPasswordField(state: RegisterBusinessState, focusRequester: F
         { value -> state.confirmPassword = value },
         visualTransformation = PasswordVisualTransformation(),
         isError = state.isConfirmPasswordError.value,
-        errorText = state.errorMassageConfirmPassword
+        errorText = state.errorMassageConfirmPassword,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+
     )
 }

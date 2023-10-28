@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,12 +14,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.bugwriters.GlobalInformationDialog
+import org.bugwriters.GlobalProgressCircle
 import org.bugwriters.Screens
+import org.bugwriters.connection.models.bodies.Roles
 import org.bugwriters.reusable_ui_elements.BasicButton
+import org.bugwriters.reusable_ui_elements.Card
 import org.bugwriters.reusable_ui_elements.TextButton
 import org.bugwriters.reusable_ui_elements.TextField
 import org.bugwriters.reusable_ui_elements.ViewHolder
@@ -33,13 +44,7 @@ fun LoginScreenView(state: LoginViewState, navController: NavController) {
     ViewHolder(
         Alignment.CenterHorizontally, Arrangement.Center
     ) {
-        Column(
-            modifier = Modifier
-                .size(360.dp, 450.dp)
-                .shadow(5.dp, spotColor = Color.Black, ambientColor = Green),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Card {
             Text(text = "LOGIN", fontSize = 24.sp, color = Green)
             Spacer(modifier = Modifier.height(dp40))
             UsernameField(state, it)
@@ -47,9 +52,11 @@ fun LoginScreenView(state: LoginViewState, navController: NavController) {
             PasswordField(state, it)
             Spacer(modifier = Modifier.height(dp40))
             BasicButton("Log in", Green, enabled = !state.isError.value) {
-                navController.navigate(Screens.main_screen_client) {
-                    launchSingleTop = true
+                GlobalProgressCircle.show()
+                CoroutineScope(Dispatchers.IO).launch {
+                  state.login(navController)
                 }
+
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -85,7 +92,8 @@ private fun UsernameField(state: LoginViewState, focusRequester: FocusRequester)
         "Email",
         state.email,
         { value -> state.email = value },
-        isError = state.isErrorName.value, errorText = state.errorMassageName
+        isError = state.isErrorName.value, errorText = state.errorMassageName,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
     )
 }
 
@@ -97,6 +105,7 @@ private fun PasswordField(state: LoginViewState, focusRequester: FocusRequester)
         state.password,
         { value -> state.password = value },
         visualTransformation = PasswordVisualTransformation(),
-        isError = state.isPasswordError.value, errorText = state.errorMassagePassword
+        isError = state.isPasswordError.value, errorText = state.errorMassagePassword,
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
     )
 }

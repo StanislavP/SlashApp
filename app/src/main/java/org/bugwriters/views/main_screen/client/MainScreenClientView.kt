@@ -1,5 +1,6 @@
 package org.bugwriters.views.main_screen.client
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,8 +22,12 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.bugwriters.Config
+import org.bugwriters.GlobalLogoutDialog
 import org.bugwriters.Item
 import org.bugwriters.Screens
 import org.bugwriters.ShoppingCart
@@ -32,7 +37,7 @@ import java.math.BigDecimal
 @Composable
 fun MainScreenClientView(navController: NavController) {
 
-    val items = listOf<Item>(
+    val items = listOf(
         Item(BigDecimal("0.05"), "Test 05"),
         Item(BigDecimal("0.10"), "Test 10"),
         Item(BigDecimal("0.50"), "Test 50"),
@@ -48,20 +53,29 @@ fun MainScreenClientView(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "COMPANY NAME")
+                    Text(
+                        text = Config.name,
+                        color = Color.White,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                GlobalLogoutDialog.show()
+                            },
+                        textAlign = TextAlign.Center
+                    )
                 },
                 backgroundColor = Green
             )
         }
     ) { innerPadding ->
-        Column(horizontalAlignment = Alignment.CenterHorizontally){
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(ShoppingCart.totalAmount.value.toPlainString())
             Spacer(modifier = Modifier.height(8.dp))
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
                 modifier = Modifier.padding(innerPadding)
-            ){
-                items(items){item ->
+            ) {
+                items(items) { item ->
                     GridItem(item = item)
                 }
             }
@@ -72,7 +86,7 @@ fun MainScreenClientView(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
                 navController.navigate(Screens.checkout)
-            } ) {
+            }) {
                 Text("Checkout")
             }
         }

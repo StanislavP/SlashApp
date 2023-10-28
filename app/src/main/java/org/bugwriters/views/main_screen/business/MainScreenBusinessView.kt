@@ -36,10 +36,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import org.bugwriters.Config
+import org.bugwriters.GlobalLogoutDialog
+import org.bugwriters.R
 import org.bugwriters.Screens
 import org.bugwriters.models.Item
 import org.bugwriters.ui.theme.Green
@@ -49,8 +53,17 @@ fun MainScreenBusinessView(navController: NavController) {
     Column {
         TopAppBar(
             title = {
+                Icon(
+                    painter = painterResource(id = R.drawable.logout),
+                    contentDescription = null,
+                    Modifier
+                        .size(40.dp)
+                        .clickable {
+                            GlobalLogoutDialog.show()
+                        }, tint = Color.White
+                )
                 Text(
-                    text = "COMPANY NAME",
+                    text = Config.name,
                     color = Color.White,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center

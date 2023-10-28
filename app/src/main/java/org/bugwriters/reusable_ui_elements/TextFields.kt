@@ -60,8 +60,10 @@ fun TextField(
     disabledBackGroundColor: Color = Color.Gray,
     width: Dp = 320.dp,
     height: Dp = 50.dp,
+    roundedCorners: Dp = 50.dp,
     textSize: TextUnit = 16.sp,
     textAlign: TextAlign = TextAlign.End,
+    maxLines:Int =1,
     textColor: Color = Color.Black,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -106,13 +108,14 @@ fun TextField(
                 }
                 .then(
                     if (enabled) Modifier.border(
-                        2.dp, backGroundColor, RoundedCornerShape(50.dp)
+                        2.dp, backGroundColor, RoundedCornerShape(roundedCorners)
                     ) else Modifier.border(
-                        2.dp, disabledBackGroundColor, RoundedCornerShape(50.dp)
+                        2.dp, disabledBackGroundColor, RoundedCornerShape(roundedCorners)
                     )
                 )
                 .then(modifier),
-            singleLine = true,
+            singleLine = maxLines ==1,
+            maxLines = maxLines,
             enabled = enabled,
             cursorBrush = SolidColor(Color.Black)
         ) {
