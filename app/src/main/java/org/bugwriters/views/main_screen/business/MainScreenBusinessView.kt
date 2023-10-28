@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -34,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -41,15 +44,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.bugwriters.Config
 import org.bugwriters.GlobalLogoutDialog
+import org.bugwriters.GlobalProgressCircle
 import org.bugwriters.R
 import org.bugwriters.Screens
+import org.bugwriters.connection.API
+import org.bugwriters.connection.createRetrofitService
+import org.bugwriters.connection.executeRequest
+import org.bugwriters.dialog_controllers.DialogBuilder
+import org.bugwriters.dialog_controllers.DialogTypes
 import org.bugwriters.models.Item
 import org.bugwriters.ui.theme.Green
 
 @Composable
 fun MainScreenBusinessView(navController: NavController) {
+    val state = remember{ MainScreenBusinessState(navController) }
     Column {
         TopAppBar(
             title = {
@@ -74,7 +87,13 @@ fun MainScreenBusinessView(navController: NavController) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
-                    Modifier.size(40.dp), tint = Color.White
+                    Modifier
+                        .size(40.dp)
+                        .clickable {
+                            navController.navigate(Screens.add_offer) {
+                                launchSingleTop = true
+                            }
+                        }, tint = Color.White
                 )
             }
         )
@@ -83,24 +102,22 @@ fun MainScreenBusinessView(navController: NavController) {
                 .fillMaxSize()
                 .padding(5.dp)
         ) {
-            item {
+            items(state.items) {
                 BusinessItem(
-                    Item("SAPUN", "MNOGO QKA KOMPANIQ BRAT", "420.69", "NESHTO"),
+                    it.toItem(),
                     {
-                        navController.navigate(Screens.edit_offer) {
+                        navController.navigate(Screens.edit_offer + "?id=${it.id}") {
                             launchSingleTop = true
                         }
                     },
-                ) {}
-            }
-            item {
-                ClientItem(
-                    Item("MNOGOQKSAPUN", "MNOGO QKA KOMPANIQ BRAT", "420.69", "NESHTO")
-                ) {}
+                ) {
+                    state.deleteId = it.id
+                    state.dialog.show()
+                }
             }
         }
-
     }
+    state.dialog.View()
 }
 
 
@@ -143,30 +160,41 @@ fun BusinessItem(item: Item, onClickEdit: () -> Unit, onClickDelete: () -> Unit)
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(maxWidth * 0.20f)
-                        .background(Green)
-                        .clickable { onClickEdit() }, contentAlignment = Alignment.Center
+                        .width(maxWidth * 0.20f), contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Green, RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { onClickEdit() }, contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(maxWidth * 0.20f)
-                        .background(Color.Red)
-                        .clickable { onClickDelete() }, contentAlignment = Alignment.Center
+                        .width(maxWidth * 0.20f), contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color.Red, RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { onClickDelete() }, contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
-
 
             }
         }
@@ -182,7 +210,7 @@ fun BusinessItem(item: Item, onClickEdit: () -> Unit, onClickDelete: () -> Unit)
 }
 
 @Composable
-fun ClientItem(item: Item, onAdd: () -> Unit) {
+fun ClientItem(item: Item, onAdd: (Item) -> Unit) {
     var expand by remember {
         mutableStateOf(0.dp)
     }
@@ -220,17 +248,24 @@ fun ClientItem(item: Item, onAdd: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(maxWidth * 0.20f)
-                        .background(Green)
-                        .clickable { onAdd() }, contentAlignment = Alignment.Center
+                        .width(maxWidth * 0.20f), contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = null,
-                        tint = Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Green, RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { onAdd(item) }, contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
                 }
             }
+
         }
         Box(
             modifier = Modifier

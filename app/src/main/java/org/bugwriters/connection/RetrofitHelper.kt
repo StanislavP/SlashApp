@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 fun <T> createRetrofitService(serviceClass: Class<T>): T {
-    return Retrofit.Builder().baseUrl("http://192.168.133.171:8080/").client(
+    return Retrofit.Builder().baseUrl("http://95.43.202.26:8090/").client(
         OkHttpClient.Builder().callTimeout(1, TimeUnit.MINUTES)
             .connectTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(1, TimeUnit.MINUTES)
@@ -33,9 +33,9 @@ suspend fun <T : BasicResponse> executeRequest(
     return try {
         RequestValidator(isServerError = false, value = execute(), isTest)
     } catch (e: Exception) {
-        if (e is HttpException && e.message == " HTTP 401") {
+        if (e is HttpException && e.message?.contains("HTTP 401",ignoreCase = true) == true && !isTest) {
             BackToLoginDialog.show()
-            RequestValidator(isServerError = true, value = null, isTest)
+           return RequestValidator(isServerError = true, value = null, isTest)
         }
         Log.d("NetworkError", e.printStackTrace().toString())
         if (!isTest) {

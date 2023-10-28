@@ -12,7 +12,7 @@ enum class Ports(val port: String) {
 }
 
 object RetrofitHelper {
-    private const val baseURLTest = "http://192.168.133.171:8080/"
+    private const val baseURLTest = "http://95.43.202.26:8090/"
 
     fun getInstance(): Retrofit {
         val client = OkHttpClient.Builder()

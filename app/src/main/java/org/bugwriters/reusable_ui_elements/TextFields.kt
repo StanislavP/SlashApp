@@ -63,7 +63,7 @@ fun TextField(
     roundedCorners: Dp = 50.dp,
     textSize: TextUnit = 16.sp,
     textAlign: TextAlign = TextAlign.End,
-    maxLines:Int =1,
+    maxLines: Int = 1,
     textColor: Color = Color.Black,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -114,7 +114,7 @@ fun TextField(
                     )
                 )
                 .then(modifier),
-            singleLine = maxLines ==1,
+            singleLine = maxLines == 1,
             maxLines = maxLines,
             enabled = enabled,
             cursorBrush = SolidColor(Color.Black)
@@ -137,7 +137,7 @@ fun TextField(
                             val placeable = measurable.measure(constraints)
                             maxWidth =
                                 (width - 20.dp) - placeable.width.toDp()
-                            float = maxWidth!!.value
+                            float = if (text.isBlank()) maxWidth!!.value else 0f
                             layout(placeable.width, placeable.height) {
                                 placeable.placeRelative(0, 0)
                             }

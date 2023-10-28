@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -22,6 +23,7 @@ import org.bugwriters.connection.models.bodies.Roles
 import org.bugwriters.paymentprovider.stripe.StripeHelper
 import org.bugwriters.ui.theme.SlashAppTheme
 import org.bugwriters.views.edit_screen.EditOfferScreenView
+import org.bugwriters.views.edit_screen.ViewType
 import org.bugwriters.views.login_screen.LoginScreenView
 import org.bugwriters.views.login_screen.LoginViewState
 import org.bugwriters.views.main_screen.business.MainScreenBusinessView
@@ -32,6 +34,7 @@ import org.bugwriters.views.register.register_business.RegisterBusinessState
 import org.bugwriters.views.register.register_business.RegisterViewBusiness
 import org.bugwriters.views.register.register_client.RegisterClientState
 import org.bugwriters.views.register.register_client.RegisterViewClient
+import org.bugwriters.views.shopping_cart.ShoppingCartView
 import java.math.BigDecimal
 
 class MainActivity : ComponentActivity() {
@@ -94,12 +97,24 @@ class MainActivity : ComponentActivity() {
                     composable(Screens.main_screen_business) {
                         MainScreenBusinessView(navController)
                     }
-                    composable(Screens.edit_offer) {
-                        EditOfferScreenView()
+                    composable(
+                        Screens.edit_offer + "?id={id}",
+                        arguments = listOf(navArgument("id") {
+                            nullable = true
+                        })
+                    ) {
+                        val id = it.arguments?.getString("id", "0")
+                        EditOfferScreenView(ViewType.EDIT, navController = navController,id?.toLong())
+                    }
+                    composable(Screens.add_offer) {
+                        EditOfferScreenView(ViewType.ADD, navController, null)
                     }
                     composable(Screens.main_screen_client) {
 
                         MainScreenClientView(navController)
+                    }
+                    composable(Screens.shopping_cart) {
+                        ShoppingCartView(navController)
                     }
                     composable(Screens.checkout) {
                         val viewModel: CheckoutViewModel = viewModel {
@@ -107,7 +122,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
-
                         CheckoutView(viewModel = viewModel, navController = navController)
                     }
                 }

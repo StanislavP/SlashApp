@@ -20,7 +20,7 @@ object BackToLoginDialog {
 
     fun init(navController: NavController) {
         dialog =
-            DialogBuilder().setType(DialogTypes.ConfirmDialog).setOnConfirm {
+            DialogBuilder().setType(DialogTypes.InformationDialog).setOnConfirm {
                 Config.clear()
                 MainScope().launch {
                     navController.navigate(Screens.login) {

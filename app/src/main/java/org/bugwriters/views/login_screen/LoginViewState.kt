@@ -45,8 +45,6 @@ class LoginViewState {
     val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
     val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
 
-    private val scope = CoroutineScope(Dispatchers.IO)
-
     suspend fun login(navController: NavController): Roles? {
 
         val service = createRetrofitService(API::class.java)
