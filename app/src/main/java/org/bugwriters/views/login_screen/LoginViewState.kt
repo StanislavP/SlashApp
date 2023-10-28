@@ -16,7 +16,7 @@ class LoginViewState {
         password.isEmpty()
     }
     val isError = derivedStateOf {
-        isErrorName.value || isPasswordError.value
+        isErrorName.value ||  isPasswordError.value
     }
     val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
     val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)

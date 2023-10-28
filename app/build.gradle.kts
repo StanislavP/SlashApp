@@ -68,8 +68,6 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-
-    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
     val composeBom = platform("androidx.compose:compose-bom:2023.08.00")
     implementation (composeBom)
     androidTestImplementation (composeBom)

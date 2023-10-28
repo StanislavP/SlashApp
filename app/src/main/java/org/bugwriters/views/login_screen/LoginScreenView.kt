@@ -46,7 +46,7 @@ fun LoginScreenView(state: LoginViewState, navController: NavController) {
             Spacer(modifier = Modifier.height(10.dp))
             PasswordField(state, it)
             Spacer(modifier = Modifier.height(dp40))
-            BasicButton("Log in", Green, enabled = true) {
+            BasicButton("Log in", Green, enabled = !state.isError.value) {
                 navController.navigate(Screens.main_screen_business) {
                     launchSingleTop = true
                 }
@@ -84,7 +84,9 @@ private fun UsernameField(state: LoginViewState, focusRequester: FocusRequester)
         focusRequester = focusRequester,
         "Email",
         state.email,
-        { value -> state.email = value })
+        { value -> state.email = value },
+        isError = state.isErrorName.value, errorText = state.errorMassageName
+    )
 }
 
 @Composable
@@ -94,6 +96,7 @@ private fun PasswordField(state: LoginViewState, focusRequester: FocusRequester)
         "Password",
         state.password,
         { value -> state.password = value },
-        visualTransformation = PasswordVisualTransformation()
+        visualTransformation = PasswordVisualTransformation(),
+        isError = state.isPasswordError.value, errorText = state.errorMassagePassword
     )
 }

@@ -11,6 +11,8 @@ class RegisterClientState {
     var familyName by mutableStateOf("")
     var email by mutableStateOf("")
     var password by mutableStateOf("")
+    var confirmPassword by mutableStateOf("")
+
     val isErrorName = derivedStateOf {
         name.isEmpty()
     }
@@ -23,12 +25,16 @@ class RegisterClientState {
     val isPasswordError = derivedStateOf {
         password.isEmpty()
     }
+    val isConfirmPasswordError = derivedStateOf {
+        confirmPassword.isEmpty() || confirmPassword!= password
+    }
     val isError = derivedStateOf {
-        isErrorName.value || isErrorFamilyName.value || isErrorEmail.value || isPasswordError.value
+        isErrorName.value || isErrorFamilyName.value || isErrorEmail.value || isPasswordError.value || isConfirmPasswordError.value
     }
     val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
     val errorMassageFamilyName by mutableStateOf(ErrorMessages.emptyField)
     val errorMassageEmail by mutableStateOf(ErrorMessages.emptyField)
     val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
+    val errorMassageConfirmPassword by mutableStateOf(ErrorMessages.emptyField)
 
 }

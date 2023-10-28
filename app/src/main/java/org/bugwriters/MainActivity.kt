@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.bugwriters.ui.theme.SlashAppTheme
+import org.bugwriters.views.EditOfferScreenView
 import org.bugwriters.views.register.register_client.RegisterClientState
 import org.bugwriters.views.register.register_client.RegisterViewClient
 import org.bugwriters.views.login_screen.LoginScreenView
@@ -47,8 +48,10 @@ class MainActivity : ComponentActivity() {
                         RegisterViewBusiness(state)
                     }
                     composable(Screens.main_screen_business) {
-
-                        MainScreenBusinessView()
+                        MainScreenBusinessView(navController)
+                    }
+                    composable(Screens.edit_offer) {
+                        EditOfferScreenView()
                     }
                 }
             }

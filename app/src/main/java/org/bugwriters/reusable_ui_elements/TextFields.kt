@@ -18,10 +18,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.bugwriters.R
+import org.bugwriters.customTextSelectionColors
 import org.bugwriters.ui.theme.Green
 
 @Composable
@@ -74,92 +77,94 @@ fun TextField(
     var showError by remember {
         mutableStateOf(false)
     }
-    BasicTextField(
-        value = text,
-        onValueChange = {
-            if (showError) {
-                showError = false
-            }
-            onValueChange(it)
-        },
-        textStyle = TextStyle(
-            fontSize = textSize, color = textColor,
-            textAlign = textAlign,
-        ),
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
-        modifier = Modifier
-            .size(width, height)
-            .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
-            .onFocusChanged {
-                if (it.isFocused) {
-                    float = 0f
-                } else {
-                    if (text.isBlank()) {
-                        float = maxWidth?.value ?: 0.dp.value
+    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+        BasicTextField(
+            value = text,
+            onValueChange = {
+                if (showError) {
+                    showError = false
+                }
+                onValueChange(it)
+            },
+            textStyle = TextStyle(
+                fontSize = textSize, color = textColor,
+                textAlign = textAlign,
+            ),
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions, keyboardActions = keyboardActions,
+            modifier = Modifier
+                .size(width, height)
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
+                .onFocusChanged {
+                    if (it.isFocused) {
+                        float = 0f
+                    } else {
+                        if (text.isBlank()) {
+                            float = maxWidth?.value ?: 0.dp.value
+                        }
+                    }
+                }
+                .then(
+                    if (enabled) Modifier.border(
+                        2.dp, backGroundColor, RoundedCornerShape(50.dp)
+                    ) else Modifier.border(
+                        2.dp, disabledBackGroundColor, RoundedCornerShape(50.dp)
+                    )
+                )
+                .then(modifier),
+            singleLine = true,
+            enabled = enabled,
+            cursorBrush = SolidColor(Color.Black)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .offset(animateFloatAsState(targetValue = float, label = "").value.dp),
+                ) {
+                    Text(
+                        text = label,
+                        color = Color.Gray,
+                        modifier = Modifier.layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            maxWidth =
+                                (width - 20.dp) - placeable.width.toDp()
+                            float = maxWidth!!.value
+                            layout(placeable.width, placeable.height) {
+                                placeable.placeRelative(0, 0)
+                            }
+                        })
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 10.dp)
+                ) {
+                    BoxWithConstraints(
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    ) {
+                        it()
                     }
                 }
             }
-            .then(
-                if (enabled) Modifier.border(
-                    2.dp, backGroundColor, RoundedCornerShape(50.dp)
-                ) else Modifier.border(
-                    2.dp, disabledBackGroundColor, RoundedCornerShape(50.dp)
-                )
-            )
-            .then(modifier),
-        singleLine = true,
-        enabled = enabled,
-        cursorBrush = SolidColor(Color.Black)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BoxWithConstraints(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .offset(animateFloatAsState(targetValue = float, label = "").value.dp),
-            ) {
-                Text(
-                    text = label,
-                    color = Color.Gray,
-                    modifier = Modifier.layout { measurable, constraints ->
-                        val placeable = measurable.measure(constraints)
-                        maxWidth =
-                            (width - 20.dp) - placeable.width.toDp()
-                        float = maxWidth!!.value
-                        layout(placeable.width, placeable.height) {
-                            placeable.placeRelative(0, 0)
-                        }
-                    })
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 10.dp)
-            ) {
-                BoxWithConstraints(
-                    modifier = Modifier.align(Alignment.CenterEnd)
+            AnimatedVisibility(visible = isError) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 15.dp)
                 ) {
-                    it()
+                    Text(
+                        text = errorText,
+                        color = MaterialTheme.colors.error,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End
+                    )
                 }
-            }
-        }
-        AnimatedVisibility(visible = isError) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 15.dp)
-            ) {
-                Text(
-                    text = errorText,
-                    color = MaterialTheme.colors.error,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End
-                )
             }
         }
     }

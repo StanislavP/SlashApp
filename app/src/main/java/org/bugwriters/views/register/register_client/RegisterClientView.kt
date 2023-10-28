@@ -55,6 +55,8 @@ fun RegisterViewClient(state: RegisterClientState) {
             Spacer(modifier = Modifier.height(dp10))
             PasswordField(state, it)
             Spacer(modifier = Modifier.height(dp40))
+            ConfirmPasswordField(state,it)
+            Spacer(modifier = Modifier.height(dp40))
             BasicButton("Register", Green, enabled = !state.isError.value) {
             }
         }
@@ -107,5 +109,17 @@ private fun PasswordField(state: RegisterClientState, focusRequester: FocusReque
         visualTransformation = PasswordVisualTransformation(),
         isError = state.isPasswordError.value,
         errorText = state.errorMassagePassword
+    )
+}
+@Composable
+private fun ConfirmPasswordField(state: RegisterClientState, focusRequester: FocusRequester) {
+    TextField(
+        focusRequester = focusRequester,
+        "Password",
+        state.confirmPassword,
+        { value -> state.confirmPassword = value },
+        visualTransformation = PasswordVisualTransformation(),
+        isError = state.isConfirmPasswordError.value,
+        errorText = state.errorMassageConfirmPassword
     )
 }
