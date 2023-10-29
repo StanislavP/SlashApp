@@ -21,6 +21,7 @@ import org.bugwriters.connection.executeRequest
 import org.bugwriters.connection.models.bodies.Roles
 import org.bugwriters.paymentprovider.stripe.StripeHelper
 import org.bugwriters.ui.theme.SlashAppTheme
+import org.bugwriters.views.SplashScreen
 import org.bugwriters.views.edit_screen.EditOfferScreenView
 import org.bugwriters.views.edit_screen.ViewType
 import org.bugwriters.views.login_screen.LoginScreenView
@@ -40,28 +41,9 @@ class MainActivity : ComponentActivity() {
     private val activity = this
     override fun onCreate(savedInstanceState: Bundle?) = runBlocking {
         super.onCreate(savedInstanceState)
-        val service = createRetrofitService(API::class.java)
-        var screen by mutableStateOf(Screens.login)
         SharedPreferences.init(baseContext)
         Config.getPreferences()
-        if (Config.cookie.isNotBlank()) {
-            withContext(Dispatchers.IO) {
-                async {
-                    executeRequest(true) {
-                        service.isCookieValid()
-                    }.onSuccess {
-                        screen =
-                            if (Config.role != null && Config.role == Roles.ROLE_CLIENT.name) Screens.main_screen_client
-                            else if (Config.role != null && Config.role == Roles.ROLE_BUSINESS.name) Screens.main_screen_business
-                            else Screens.login
-                    }.onFailure {
-                        Config.clear()
-                    }.onServerError {
-                        Config.clear()
-                    }
-                }.await()
-            }
-        }
+
         StripeHelper.init(activity)
         setContent {
             val navController = rememberNavController()
@@ -70,8 +52,11 @@ class MainActivity : ComponentActivity() {
 
             SlashAppTheme {
                 NavHost(
-                    navController = navController, startDestination = screen
+                    navController = navController, startDestination = Screens.splashScreen
                 ) {
+                    composable(Screens.splashScreen) {
+                        SplashScreen(navController)
+                    }
                     composable(Screens.login) {
                         val state = remember {
                             LoginViewState()
