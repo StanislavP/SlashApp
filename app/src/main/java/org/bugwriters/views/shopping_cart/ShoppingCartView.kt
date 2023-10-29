@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,25 +46,33 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.bugwriters.GlobalProgressCircle
 import org.bugwriters.R
 import org.bugwriters.ShoppingCart
 import org.bugwriters.paymentprovider.stripe.StripeHelper
-import org.bugwriters.paymentprovider.stripe.toCurrencyLong
 import org.bugwriters.reusable_ui_elements.ViewHolder
 import org.bugwriters.ui.theme.Green
 import org.bugwriters.views.main_screen.client.checkout.CheckoutViewModel
+import java.math.RoundingMode
 
 @Composable
 fun ShoppingCartView(navController: NavController) {
     val viewModel = viewModel {
-        CheckoutViewModel(navController)
+        CheckoutViewModel()
     }
     LaunchedEffect(key1 = StripeHelper.paymentState.value) {
         when (StripeHelper.paymentState.value) {
-            StripeHelper.PaymentStates.CANCELED -> {}
-            StripeHelper.PaymentStates.FAILED -> {}
+            StripeHelper.PaymentStates.CANCELED -> {
+                GlobalProgressCircle.dismiss()
+            }
+
+            StripeHelper.PaymentStates.FAILED -> {
+                GlobalProgressCircle.dismiss()
+            }
+
             StripeHelper.PaymentStates.COMPLETED -> {
                 ShoppingCart.clearCart()
+                GlobalProgressCircle.dismiss()
                 navController.popBackStack()
                 StripeHelper.reset()
             }
@@ -73,6 +82,17 @@ fun ShoppingCartView(navController: NavController) {
     }
     ViewHolder {
         TopAppBar(
+            navigationIcon = {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable {
+                            navController.popBackStack()
+                        }, tint = Color.White
+                )
+            },
             title = {
                 Text(
                     text = "Shopping Cart",
@@ -82,6 +102,17 @@ fun ShoppingCartView(navController: NavController) {
                 )
             },
             backgroundColor = Green,
+            actions = {
+                Text(
+                    text = "Total: " + ShoppingCart.totalAmount.value.setScale(
+                        2,
+                        RoundingMode.HALF_UP
+                    ),
+                    fontSize = 18.sp,
+                    color = Color.White,
+
+                    )
+            }
         )
         Box(modifier = Modifier.padding(5.dp)) {
             LazyColumn(

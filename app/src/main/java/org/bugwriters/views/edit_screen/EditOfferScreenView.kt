@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -19,10 +20,10 @@ import org.bugwriters.GlobalProgressCircle
 import org.bugwriters.connection.models.bodies.ProductType
 import org.bugwriters.reusable_ui_elements.BasicButton
 import org.bugwriters.reusable_ui_elements.Card
+import org.bugwriters.reusable_ui_elements.CustomSwitchButtonTexts
 import org.bugwriters.reusable_ui_elements.TextField
 import org.bugwriters.reusable_ui_elements.ViewHolder
 import org.bugwriters.ui.theme.Green
-import org.bugwriters.reusable_ui_elements.CustomSwitchButtonTexts
 
 enum class ViewType(val title: String) {
     ADD("Add"), EDIT("Edit")
@@ -31,6 +32,8 @@ enum class ViewType(val title: String) {
 
 @Composable
 fun EditOfferScreenView(type: ViewType, navController: NavController, id: Long?) {
+
+
     val state = remember {
         EditScreenState(navController = navController, id)
     }
@@ -71,10 +74,19 @@ private fun NameField(state: EditScreenState, focusRequester: FocusRequester) {
         focusRequester = focusRequester,
         "Name",
         state.name,
-        { value -> state.name = value },
+        { value ->
+            var text = value
+            if (value.contains(",")) text = value.replace(",", ".")
+            if (value.contains("_")) text = value.replace("_", ".")
+            if (value.contains("-")) text = value.replace("-", ".")
+            state.name = text
+        },
         isError = state.isErrorName.value,
         errorText = state.errorMassageName,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        )
     )
 }
 
@@ -101,7 +113,10 @@ private fun PriceField(state: EditScreenState, focusRequester: FocusRequester) {
         { value -> state.price = value },
         isError = state.isErrorPrice.value,
         errorText = state.errorMassagePrice,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        )
     )
 }
 
@@ -115,6 +130,11 @@ private fun DescriptionField(state: EditScreenState, focusRequester: FocusReques
         roundedCorners = 5.dp,
         maxLines = 3,
         height = 100.dp,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+        isError = state.isDescriptionError.value,
+        errorText = state.errorMassageDescription,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+        ),
     )
 }

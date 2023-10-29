@@ -3,20 +3,18 @@ package org.bugwriters.views.main_screen.client
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -27,12 +25,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -68,7 +64,6 @@ fun MainScreenClientView(navController: NavController) {
                 )
             },
             title = {
-
                 AnimatedVisibility(visible = !state.isSearchOpen) {
                     Text(
                         text = Config.name,
@@ -78,37 +73,48 @@ fun MainScreenClientView(navController: NavController) {
                     )
                 }
                 AnimatedVisibility(visible = state.isSearchOpen) {
-                    Box(modifier = Modifier.background(Color.White, RoundedCornerShape(50.dp))) {
-                        TextField(
-                            it,
-                            text = state.searchText,
-                            modifier = Modifier.fillMaxWidth(),
-                            label = "",
-                            onValueChange = {
-                                state.searchText = it
-                                state.changeFilter(it)
-                            }
-                        )
-
-                    }
-                    DropdownMenu(
-                        expanded = state.expanded,
-                        onDismissRequest = { state.expanded = false },
-                        modifier = Modifier.heightIn(
-                            Dp.Unspecified, 300.dp
-                        ), properties = PopupProperties(clippingEnabled = false)
+                    Column(
+                        Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        for (item in state.filter)
-                            DropdownMenuItem(onClick = {
-                                state.searchText = item.name
-                                state.getAllItemsByBusiness()
-                            }) {
-                                Text(text = item.name)
+                        Box(
+                            modifier = Modifier.background(
+                                Color.White,
+                                RoundedCornerShape(50.dp)
+                            )
+                        ) {
+                            TextField(
+                                it,
+                                text = state.searchText,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .onFocusChanged {
+                                        state.expanded = it.hasFocus
+                                    },
+                                label = "",
+                                onValueChange = {
+                                    state.searchText = it
+                                    state.changeFilter(it)
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = state.expanded,
+                                onDismissRequest = { state.expanded = false },
+                                modifier = Modifier
+                                    .heightIn(Dp.Unspecified, 300.dp)
+                                    .width(320.dp)
+                                    .background(Color.White),
+                                properties = PopupProperties(clippingEnabled = false)
+                            ) {
+                                for (item in state.filter)
+                                    DropdownMenuItem(onClick = {
+                                        state.searchText = item.name
+                                        state.getAllItemsByBusiness()
+                                    }) { Text(text = item.name) }
                             }
+                        }
                     }
-
                 }
-
             },
             backgroundColor = Green,
             actions = {

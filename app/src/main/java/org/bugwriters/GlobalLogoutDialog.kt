@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.bugwriters.connection.API
 import org.bugwriters.connection.createRetrofitService
 import org.bugwriters.connection.executeRequest
@@ -52,14 +51,4 @@ object GlobalLogoutDialog {
     fun dismiss() {
         dialog.dismiss()
     }
-
-    fun isDialogOpen(): Boolean {
-        return dialog.isOpen()
-    }
-
-    fun getDialogProperties(): CustomDialog.Properties {
-        return dialog.properties
-    }
-
-
 }

@@ -10,6 +10,4 @@ object Screens {
     const val edit_offer = "edit_offer"
     const val add_offer = "add_offer"
     const val login = "login"
-    const val checkout = "checkout"
-
 }

@@ -17,28 +17,37 @@ import org.bugwriters.connection.createRetrofitService
 import org.bugwriters.connection.executeRequest
 import org.bugwriters.connection.models.bodies.AddOfferBody
 import org.bugwriters.connection.models.bodies.ProductType
+import java.math.BigDecimal
 import java.math.RoundingMode
 
-class EditScreenState(val navController: NavController,val id: Long?) {
+class EditScreenState(val navController: NavController, val id: Long?) {
     var isLoading by mutableStateOf(false)
     var name by mutableStateOf("")
     var price by mutableStateOf("")
     var description by mutableStateOf("")
     var type by mutableStateOf(ProductType.SERVICE)
     val isErrorName = derivedStateOf {
-        name.isEmpty()
+        name.isBlank()
     }
     val isErrorPrice = derivedStateOf {
-        price.isEmpty()
+        if (price.isBlank()) {
+            errorMassagePrice = ErrorMessages.emptyField
+            return@derivedStateOf price.isBlank()
+        }
+        else if (price.toBigDecimal() < BigDecimal.ONE) {
+            errorMassagePrice = ErrorMessages.priceSmallerThanOne
+            return@derivedStateOf price.toBigDecimal() < BigDecimal.ONE
+        } else false
     }
     val isDescriptionError = derivedStateOf {
-        description.isEmpty()
+        description.isBlank()
     }
     val isError = derivedStateOf {
         isErrorName.value || isErrorPrice.value || isDescriptionError.value
     }
     val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
-    val errorMassagePrice by mutableStateOf(ErrorMessages.emptyField)
+    var errorMassagePrice by mutableStateOf(ErrorMessages.emptyField)
+    val errorMassageDescription by mutableStateOf(ErrorMessages.emptyField)
 
     init {
         if (id != null) {
@@ -87,6 +96,7 @@ class EditScreenState(val navController: NavController,val id: Long?) {
             }
         }
     }
+
     fun editItem() {
         GlobalProgressCircle.show()
         val service = createRetrofitService(API::class.java)

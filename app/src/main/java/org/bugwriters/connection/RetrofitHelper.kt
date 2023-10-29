@@ -14,8 +14,10 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+const val ip = "http://192.168.133.171:8080/"
+
 fun <T> createRetrofitService(serviceClass: Class<T>): T {
-    return Retrofit.Builder().baseUrl("http://95.43.202.26:8090/").client(
+    return Retrofit.Builder().baseUrl(ip).client(
         OkHttpClient.Builder().callTimeout(1, TimeUnit.MINUTES)
             .connectTimeout(1, TimeUnit.MINUTES)
             .writeTimeout(1, TimeUnit.MINUTES)

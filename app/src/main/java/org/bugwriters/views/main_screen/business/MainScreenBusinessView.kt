@@ -23,11 +23,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,19 +41,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.bugwriters.Config
 import org.bugwriters.GlobalLogoutDialog
-import org.bugwriters.GlobalProgressCircle
 import org.bugwriters.R
 import org.bugwriters.Screens
-import org.bugwriters.connection.API
-import org.bugwriters.connection.createRetrofitService
-import org.bugwriters.connection.executeRequest
-import org.bugwriters.dialog_controllers.DialogBuilder
-import org.bugwriters.dialog_controllers.DialogTypes
 import org.bugwriters.models.Item
 import org.bugwriters.ui.theme.Green
 

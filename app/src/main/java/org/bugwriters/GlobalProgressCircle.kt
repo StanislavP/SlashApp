@@ -29,7 +29,7 @@ object GlobalProgressCircle {
         return isVisible
     }
 
-    var progress by mutableFloatStateOf(-1f)
+    private var progress by mutableFloatStateOf(-1f)
 
     @Composable
     fun View() {

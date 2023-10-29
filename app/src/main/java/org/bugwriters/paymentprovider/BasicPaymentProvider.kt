@@ -1,7 +1,6 @@
 package org.bugwriters.paymentprovider
 
 import androidx.activity.ComponentActivity
-import org.bugwriters.paymentprovider.stripe.ClientInfo
 
 interface BasicPaymentProvider {
 

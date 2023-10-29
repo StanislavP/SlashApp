@@ -2,7 +2,6 @@ package org.bugwriters.views.main_screen.client.checkout
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -10,11 +9,9 @@ import org.bugwriters.ShoppingCart
 import org.bugwriters.paymentprovider.stripe.ClientInfo
 import org.bugwriters.paymentprovider.stripe.StripeHelper
 
-class CheckoutViewModel(
-    navController: NavController
-): ViewModel() {
+class CheckoutViewModel: ViewModel() {
 
-    val isLoading = mutableStateOf(false)
+    private val isLoading = mutableStateOf(false)
 
     suspend fun pay() {
         initiatePayment()

@@ -22,28 +22,47 @@ class RegisterClientState {
     var confirmPassword by mutableStateOf("")
 
     val isErrorName = derivedStateOf {
-        name.isEmpty()
+        name.isBlank()
     }
     val isErrorFamilyName = derivedStateOf {
-        familyName.isEmpty()
+        familyName.isBlank()
     }
     val isErrorEmail = derivedStateOf {
-        email.isEmpty()
+        if (email.isBlank()) {
+            errorMassageEmail = ErrorMessages.emptyField
+            return@derivedStateOf email.isBlank()
+        } else if (!email.matches(Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"))) {
+            errorMassageEmail = ErrorMessages.fieldShouldBeEmail
+            return@derivedStateOf true
+        } else return@derivedStateOf false
     }
     val isPasswordError = derivedStateOf {
-        password.isEmpty()
+        if (password.isBlank()) {
+            errorMassagePassword = ErrorMessages.emptyField
+            return@derivedStateOf password.isBlank()
+        } else if (password.trim().length < 6) {
+            errorMassagePassword = ErrorMessages.password6SymbolsError
+            return@derivedStateOf true
+        } else return@derivedStateOf false
     }
     val isConfirmPasswordError = derivedStateOf {
-        confirmPassword.isEmpty() || confirmPassword != password
+        if (confirmPassword.isBlank()) {
+            errorMassageConfirmPassword = ErrorMessages.emptyField
+            return@derivedStateOf confirmPassword.isBlank()
+        } else if (confirmPassword != password) {
+            errorMassageConfirmPassword = ErrorMessages.passwordsNotMatching
+            return@derivedStateOf confirmPassword != password
+        } else return@derivedStateOf false
+
     }
     val isError = derivedStateOf {
         isErrorName.value || isErrorFamilyName.value || isErrorEmail.value || isPasswordError.value || isConfirmPasswordError.value
     }
     val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
     val errorMassageFamilyName by mutableStateOf(ErrorMessages.emptyField)
-    val errorMassageEmail by mutableStateOf(ErrorMessages.emptyField)
-    val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
-    val errorMassageConfirmPassword by mutableStateOf(ErrorMessages.emptyField)
+    var errorMassageEmail by mutableStateOf(ErrorMessages.emptyField)
+    var errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
+    var errorMassageConfirmPassword by mutableStateOf(ErrorMessages.emptyField)
 
     private val scope = CoroutineScope(Dispatchers.IO)
 

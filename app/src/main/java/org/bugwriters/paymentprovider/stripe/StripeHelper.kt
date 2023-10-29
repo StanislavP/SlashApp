@@ -1,35 +1,32 @@
 package org.bugwriters.paymentprovider.stripe
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.ViewModel
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.bugwriters.RetrofitHelper
-import org.bugwriters.TestLocalServerAPI
+import org.bugwriters.GlobalProgressCircle
+import org.bugwriters.connection.API
+import org.bugwriters.connection.createRetrofitService
+import org.bugwriters.connection.executeRequest
 import org.bugwriters.paymentprovider.BasicPaymentProvider
-import org.bugwriters.views.main_screen.client.checkout.CheckoutViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 object StripeHelper : BasicPaymentProvider {
 
-    lateinit var activity: ComponentActivity
-    lateinit var type: BasicPaymentProvider.PaymentProvider
-    lateinit var paymentSheet: PaymentSheet
-    lateinit var customerConfig: PaymentSheet.CustomerConfiguration
-    lateinit var paymentIntentClientSecret: String
-    lateinit var toast: Toast
-    const val TAG: String = "STRIPE"
+    private lateinit var activity: ComponentActivity
+    private lateinit var type: BasicPaymentProvider.PaymentProvider
+    private lateinit var paymentSheet: PaymentSheet
+    private lateinit var customerConfig: PaymentSheet.CustomerConfiguration
+    private lateinit var paymentIntentClientSecret: String
+    private lateinit var toast: Toast
+    private const val TAG: String = "STRIPE"
 
     var paymentState = mutableStateOf(PaymentStates.NOT_INIT)
 
@@ -48,20 +45,21 @@ object StripeHelper : BasicPaymentProvider {
     }
 
     fun initiatePayment(client: ClientInfo) {
-        val api = RetrofitHelper.getInstance().create(TestLocalServerAPI::class.java)
-
+        val api = createRetrofitService(API::class.java)
         CoroutineScope(Dispatchers.IO).launch {
             paymentState.value = PaymentStates.STARTED
-            val response = api.postPaymentSheet(client.toRequest())
-            paymentIntentClientSecret = response.paymentIntent
-            customerConfig = PaymentSheet.CustomerConfiguration(
-                response.customer,
-                response.ephemeralKey
-            )
-            val publishableKey = response.publishableKey
-            PaymentConfiguration.init(activity.applicationContext, publishableKey)
+            GlobalProgressCircle.show()
+            executeRequest { api.postPaymentSheet(client.toRequest()) }.onSuccess {
+                paymentIntentClientSecret = it.paymentIntent
+                customerConfig = PaymentSheet.CustomerConfiguration(
+                    it.customer,
+                    it.ephemeralKey
+                )
+                val publishableKey = it.publishableKey
+                PaymentConfiguration.init(activity.applicationContext, publishableKey)
 
-            canPay = true
+                canPay = true
+            }
         }
     }
 
@@ -70,29 +68,32 @@ object StripeHelper : BasicPaymentProvider {
         canPay = false
     }
 
-    fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
+    private fun onPaymentSheetResult(paymentSheetResult: PaymentSheetResult) {
         when (paymentSheetResult) {
             is PaymentSheetResult.Canceled -> {
                 Log.d(TAG, "Payment Canceled")
-                Toast.makeText(activity.applicationContext, "Payment Canceled", Toast.LENGTH_SHORT).show()
-//                toast.setText("Payment Canceled")
-//                toast.show()
+                Toast.makeText(activity.applicationContext, "Payment Canceled", Toast.LENGTH_SHORT)
+                    .show()
                 paymentState.value = PaymentStates.CANCELED
             }
 
             is PaymentSheetResult.Failed -> {
                 Log.d(TAG, "Payment Error: ${paymentSheetResult.error}")
-                Toast.makeText(activity.applicationContext, "Payment Error: ${paymentSheetResult.error}", Toast.LENGTH_SHORT).show()
-//                toast.setText("Payment Error: ${paymentSheetResult.error}")
-//                toast.show()
+                Toast.makeText(
+                    activity.applicationContext,
+                    "Payment Error: ${paymentSheetResult.error}",
+                    Toast.LENGTH_SHORT
+                ).show()
                 paymentState.value = PaymentStates.FAILED
             }
 
             is PaymentSheetResult.Completed -> {
                 Log.d(TAG, "Payment Completed ")
-                Toast.makeText(activity.applicationContext, "Payment Successful", Toast.LENGTH_SHORT).show()
-//                toast.setText("Payment Successful")
-//                toast.show()
+                Toast.makeText(
+                    activity.applicationContext,
+                    "Payment Successful",
+                    Toast.LENGTH_SHORT
+                ).show()
                 paymentState.value = PaymentStates.COMPLETED
             }
         }
@@ -102,7 +103,7 @@ object StripeHelper : BasicPaymentProvider {
         paymentState.value = PaymentStates.NOT_INIT
     }
 
-    fun presentPaymentSheet() {
+    private fun presentPaymentSheet() {
         paymentSheet.presentWithPaymentIntent(
             paymentIntentClientSecret,
             PaymentSheet.Configuration(

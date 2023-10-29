@@ -1,22 +1,17 @@
 package org.bugwriters.views.register.register_business
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,7 +27,6 @@ import org.bugwriters.reusable_ui_elements.Card
 import org.bugwriters.reusable_ui_elements.TextField
 import org.bugwriters.reusable_ui_elements.ViewHolder
 import org.bugwriters.ui.theme.Green
-import org.bugwriters.views.register.register_client.RegisterClientState
 
 @Composable
 fun RegisterViewBusiness(state: RegisterBusinessState,navController: NavController) {
@@ -83,7 +77,7 @@ private fun NameField(state: RegisterBusinessState, focusRequester: FocusRequest
         { value -> state.name = value },
         isError = state.isErrorName.value,
         errorText = state.errorMassageName,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next)
     )
 }
 
@@ -96,7 +90,7 @@ private fun EmailField(state: RegisterBusinessState, focusRequester: FocusReques
         { value -> state.email = value },
         isError = state.isErrorEmail.value,
         errorText = state.errorMassageEmail,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email,imeAction = ImeAction.Next)
     )
 }
 
@@ -110,7 +104,7 @@ fun PasswordField(state: RegisterBusinessState, focusRequester: FocusRequester) 
         visualTransformation = PasswordVisualTransformation(),
         isError = state.isPasswordError.value,
         errorText = state.errorMassagePassword,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password,imeAction = ImeAction.Next)
     )
 }
 
@@ -118,13 +112,13 @@ fun PasswordField(state: RegisterBusinessState, focusRequester: FocusRequester) 
 private fun ConfirmPasswordField(state: RegisterBusinessState, focusRequester: FocusRequester) {
     TextField(
         focusRequester = focusRequester,
-        "Password",
+        "Confirm password",
         state.confirmPassword,
         { value -> state.confirmPassword = value },
         visualTransformation = PasswordVisualTransformation(),
         isError = state.isConfirmPasswordError.value,
         errorText = state.errorMassageConfirmPassword,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Password,imeAction = ImeAction.Done)
 
     )
 }

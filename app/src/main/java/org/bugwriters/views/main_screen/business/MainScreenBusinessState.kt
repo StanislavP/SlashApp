@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.bugwriters.GlobalProgressCircle
-import org.bugwriters.Screens
 import org.bugwriters.connection.API
 import org.bugwriters.connection.createRetrofitService
 import org.bugwriters.connection.executeRequest
@@ -28,7 +27,7 @@ class MainScreenBusinessState(val navController: NavController) {
         updateItems()
     }
 
-    fun updateItems() {
+    private fun updateItems() {
         CoroutineScope(Dispatchers.IO).launch {
             val service = createRetrofitService(API::class.java)
             executeRequest { service.getProductsMine() }.onSuccessSuspend {

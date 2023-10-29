@@ -7,7 +7,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,12 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.bugwriters.R
 import org.bugwriters.ui.theme.Green
 
 
@@ -45,61 +41,9 @@ data class CustomSwitchButtonProperties(
     val backgroundColor: Color = Color.Transparent,
     val colorActive: Color = Color.White,
     val colorNotActive: Color = Color.Black,
-    val circleAnimationSpeedMillis: Int = 100,
+    val circleAnimationSpeedMillis: Int = 300,
     val imagesColorChangeSpeedMillis: Int = (circleAnimationSpeedMillis * 0.02).toInt()
 )
-
-
-@Composable
-fun CustomSwitchButtonImages(
-    buttonWidth: Dp,
-    buttonHeight: Dp,
-    initialValue: Boolean = false,
-    enabled: Boolean = true,
-    properties: CustomSwitchButtonProperties = CustomSwitchButtonProperties(),
-    onSwitch: (Boolean) -> Unit
-) {
-    val interactionSource = remember {
-        MutableInteractionSource()
-    }
-    val switchButton = remember {
-        MutableTransitionState(initialValue)
-    }
-
-
-    LaunchedEffect(key1 = initialValue) {
-        switchButton.targetState = initialValue
-    }
-
-    Box(modifier = Modifier
-        .width(buttonWidth)
-        .height(buttonHeight)
-        .clip(CircleShape)
-        .background(properties.backgroundColor)
-        .border(2.dp, properties.borderColor, CircleShape)
-        .clickable(
-            interactionSource = interactionSource, indication = null, enabled = enabled
-        ) {
-            switchButton.targetState = !switchButton.currentState
-            onSwitch(switchButton.targetState)
-        }) {
-        Row(
-            modifier = Modifier
-                .wrapContentWidth()
-                .padding()
-                .background(Color.Transparent)
-
-        ) {
-            MovingCircle(buttonWidth, switchButton, properties)
-        }
-        SwitchButtonImages(
-            buttonWidth = buttonWidth,
-            sizeOfIcons = buttonHeight,
-            switch = switchButton,
-            properties = properties
-        )
-    }
-}
 
 @Composable
 fun CustomSwitchButtonTexts(
@@ -186,67 +130,6 @@ private fun MovingCircle(
             .background(properties.circleColor)
 
     )
-}
-
-@Composable
-private fun SwitchButtonImages(
-    buttonWidth: Dp,
-    sizeOfIcons: Dp,
-    switch: MutableTransitionState<Boolean>,
-    properties: CustomSwitchButtonProperties
-) {
-    val colorForSearch = remember {
-        Animatable(properties.colorNotActive)
-    }
-    val colorForItems = remember {
-        Animatable(properties.colorActive)
-    }
-    val padding = remember {
-        buttonWidth / 10
-    }
-    LaunchedEffect(key1 = switch.targetState) {
-        if (!switch.targetState) {
-            colorForItems.animateTo(
-                properties.colorActive,
-                tween(properties.imagesColorChangeSpeedMillis, easing = LinearEasing)
-            )
-            colorForSearch.animateTo(
-                properties.colorNotActive,
-                tween(properties.imagesColorChangeSpeedMillis, easing = LinearEasing)
-            )
-        } else {
-            colorForSearch.animateTo(
-                properties.colorActive,
-                tween(properties.imagesColorChangeSpeedMillis, easing = LinearEasing)
-            )
-            colorForItems.animateTo(
-                properties.colorNotActive,
-                tween(properties.imagesColorChangeSpeedMillis, easing = LinearEasing)
-            )
-        }
-    }
-
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.money),
-            contentDescription = "Items",
-            modifier = Modifier
-                .padding(start = padding)
-                .align(Alignment.CenterStart)
-                .size((sizeOfIcons * 0.6f)),
-            colorFilter = ColorFilter.tint(colorForItems.value),
-        )
-        Image(
-            painter = painterResource(id = R.drawable.error),
-            contentDescription = "Search",
-            modifier = Modifier
-                .padding(end = padding)
-                .align(Alignment.CenterEnd)
-                .size((sizeOfIcons * 0.6f)),
-            colorFilter = ColorFilter.tint(colorForSearch.value),
-        )
-    }
 }
 
 @Composable

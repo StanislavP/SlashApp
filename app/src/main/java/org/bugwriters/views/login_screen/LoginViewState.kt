@@ -5,10 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
-import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import org.bugwriters.Config
 import org.bugwriters.ErrorMessages
@@ -18,31 +15,29 @@ import org.bugwriters.R
 import org.bugwriters.Screens
 import org.bugwriters.connection.API
 import org.bugwriters.connection.createRetrofitService
-import org.bugwriters.connection.executeRequest
 import org.bugwriters.connection.models.bodies.LoginBody
 import org.bugwriters.connection.models.bodies.Roles
-import org.bugwriters.connection.models.responses.BasicResponse
-import org.bugwriters.connection.models.responses.LoginResponse
 import org.bugwriters.printJsonify
-import retrofit2.Call
-import retrofit2.Response
-import javax.security.auth.callback.Callback
 
-// m@m.m business
-// a@a.a client
 class LoginViewState {
-    var email by mutableStateOf("a@a.a")
-    var password by mutableStateOf("123456")
-    val isErrorName = derivedStateOf {
-        email.isEmpty()
+    var email by mutableStateOf("")
+    var password by mutableStateOf("")
+    val isErrorEmail = derivedStateOf {
+        if (email.isBlank()) {
+            errorMassageEmail = ErrorMessages.emptyField
+            return@derivedStateOf email.isBlank()
+        } else if (!email.matches(Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}\$"))) {
+            errorMassageEmail = ErrorMessages.fieldShouldBeEmail
+            return@derivedStateOf true
+        } else return@derivedStateOf false
     }
     val isPasswordError = derivedStateOf {
-        password.isEmpty()
+        password.isBlank()
     }
     val isError = derivedStateOf {
-        isErrorName.value || isPasswordError.value
+        isErrorEmail.value || isPasswordError.value
     }
-    val errorMassageName by mutableStateOf(ErrorMessages.emptyField)
+    var errorMassageEmail by mutableStateOf(ErrorMessages.emptyField)
     val errorMassagePassword by mutableStateOf(ErrorMessages.emptyField)
 
     suspend fun login(navController: NavController): Roles? {
@@ -85,7 +80,7 @@ class LoginViewState {
                     }
                     else {
                         GlobalInformationDialog.getDialogProperties()
-                            .setText("Something went wrong!!")
+                            .setText("Wrong login credentials")
                         GlobalInformationDialog.show()
                     }
                 }

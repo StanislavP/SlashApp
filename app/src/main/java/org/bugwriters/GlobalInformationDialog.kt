@@ -27,10 +27,6 @@ object GlobalInformationDialog {
         dialog.dismiss()
     }
 
-    fun isDialogOpen(): Boolean {
-        return dialog.isOpen()
-    }
-
     fun getDialogProperties(): CustomDialog.Properties {
         return dialog.properties
     }
