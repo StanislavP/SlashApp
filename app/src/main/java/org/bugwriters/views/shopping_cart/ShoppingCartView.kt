@@ -141,7 +141,6 @@ fun ShoppingCartView(navController: NavController) {
                     contentDescription = null,
                     tint = Color.White
                 )
-
             }
 
         }

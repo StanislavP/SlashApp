@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavController
 import org.bugwriters.Config
@@ -158,11 +160,19 @@ fun MainScreenClientView(navController: NavController) {
                 shape = CircleShape,
                 containerColor = Green
             ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+                Box {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                    Text(
+                        text = ShoppingCart.items.size.toString(),
+                        fontSize = 12.sp,
+                        modifier = Modifier.offset(x = 10.dp, y = 25.dp),
+                        color = Color.White,
+                    )
+                }
 
             }
 
