@@ -54,10 +54,10 @@ class MainActivity : ComponentActivity() {
                 NavHost(
                     navController = navController, startDestination = Screens.splashScreen
                 ) {
-                    composable(Screens.splashScreen) {
+                    composable(Screens.splashScreen, exitTransition = { exitDown(this) }) {
                         SplashScreen(navController)
                     }
-                    composable(Screens.login) {
+                    composable(Screens.login, enterTransition = { enterDown(this) }) {
                         val state = remember {
                             LoginViewState()
                         }
